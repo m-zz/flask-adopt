@@ -26,13 +26,13 @@ db.create_all()
 
 toolbar = DebugToolbarExtension(app)
 
+a = Pet(name= "Nelly", species= "Golden Doodle", photo_url="", age="baby", available=True)
+db.session.add(a)
+db.session.commit()
+
 @app.route('/')
 def show_pets():
     
-    a = Pet(name= "Nelly", species= "Golden Doodle", photo_url="", age="baby", available=True)
-    db.session.add(a)
-    db.session.commit()
-
     pets = Pet.query.all()
     return render_template('pets.html', pets = pets)
 
@@ -49,4 +49,23 @@ def add_pet():
         return redirect('/')
 
     return render_template('add_pet.html', form = form)
+    
+@app.route('/<int:pet_id>', methods = ["GET", "POST"])
+def edit_pet(pet_id):
+
+    pet = Pet.query.get(pet_id)
+
+    form = AddPetForm(obj=pet)
+
+    print([field.label.text for field in form])
+
+    if form.validate_on_submit():
+        new_pet = Pet(name = form.name.data, species = form.species.data, photo_url = form.photo_url.data,
+        age = form.age.data, notes = form.notes.data)
+        db.session.add(new_pet)
+        db.session.commit()
+
+        return redirect('/')
+
+    return render_template("edit_pet.html", form = form, pet=pet)
     
