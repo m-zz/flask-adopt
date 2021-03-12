@@ -7,10 +7,12 @@
 
   {% for field in form
          if field.widget.input_type != 'hidden' %}
-
+    {% if field.label.text != "Available" %}
     <p>
       {{ field.label }}
       {{ field }}
+    
+      {% endif %}
 
       {% for error in field.errors %}
         {{ error }}

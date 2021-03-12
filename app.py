@@ -25,8 +25,9 @@ db.create_all()
 # app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 toolbar = DebugToolbarExtension(app)
+app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
 
-a = Pet(name= "Nelly", species= "Golden Doodle", photo_url="", age="baby", available=True)
+a = Pet(name= "Nelly", species= "dog", age="baby")
 db.session.add(a)
 db.session.commit()
 
@@ -53,16 +54,15 @@ def add_pet():
 @app.route('/<int:pet_id>', methods = ["GET", "POST"])
 def edit_pet(pet_id):
 
-    pet = Pet.query.get(pet_id)
-
+    pet = Pet.query.get_or_404(pet_id)
     form = AddPetForm(obj=pet)
 
-    print([field.label.text for field in form])
-
     if form.validate_on_submit():
-        new_pet = Pet(name = form.name.data, species = form.species.data, photo_url = form.photo_url.data,
-        age = form.age.data, notes = form.notes.data)
-        db.session.add(new_pet)
+        print(pet.photo_url, pet.notes, pet.available)
+        pet.photo_url = form.photo_url.data
+        pet.notes = form.notes.data
+        pet.available = form.available.data
+        
         db.session.commit()
 
         return redirect('/')
