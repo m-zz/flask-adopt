@@ -8,6 +8,10 @@ from models import db, connect_db, Pet
 
 from forms import AddPetForm
 
+from project_secrets import PETFINDER_API_KEY, PETFINDER_SECRET_KEY
+
+import requests
+
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = "secret"
@@ -26,10 +30,24 @@ db.create_all()
 
 toolbar = DebugToolbarExtension(app)
 app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
+AUTH_URL = "https://api.petfinder.com/v2/oauth2/token"
 
 a = Pet(name= "Nelly", species= "dog", age="baby")
 db.session.add(a)
 db.session.commit()
+
+auth_token = None
+
+@app.before_first_request
+def refresh_credentials():
+    """Just once, get token and store it globally."""
+    global auth_token
+    auth_token = update_auth_token_string()
+
+def update_auth_token_string():
+    resp = requests.post(AUTH_URL, data = {"grant_type": "client_credentials",
+    "client_id": PETFINDER_API_KEY, "client_secret": PETFINDER_SECRET_KEY})
+    return resp.json()["access_token"]
 
 @app.route('/')
 def show_pets():
