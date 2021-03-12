@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  {% for pet in pets %}
+    {% if pet.available %}
+      <img src={{pet.photo_url}} alt="">
+      <b>{{ pet.name }} is available!</b>
+    {% endif %}
+  {% endfor %}
+
+{% endblock %}
