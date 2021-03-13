@@ -47,13 +47,24 @@ def refresh_credentials():
 def update_auth_token_string():
     resp = requests.post(AUTH_URL, data = {"grant_type": "client_credentials",
     "client_id": PETFINDER_API_KEY, "client_secret": PETFINDER_SECRET_KEY})
+    print(resp.json()["access_token"])
     return resp.json()["access_token"]
 
 @app.route('/')
 def show_pets():
+    response = requests.get("https://api.petfinder.com/v2/animals?limit=10",
+    headers = {"Authorization": f"Bearer {auth_token}"})
+    print(response)
+    response = response.json()["animals"][0]
     
+
+    random_pet = Pet(name = response["name"], species = response["species"], photo_url = response["photos"][0]["small"], age = response["age"], notes = response["description"])
+
+    # db.session.add(random_pet)
+    # db.session.commit()
+
     pets = Pet.query.all()
-    return render_template('pets.html', pets = pets)
+    return render_template('pets.html', pets = pets, random_pet=random_pet)
 
 @app.route('/add', methods = ["GET", "POST"])
 def add_pet():

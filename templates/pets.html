@@ -2,6 +2,12 @@
 
 {% block content %}
 
+<h2>Random Petfinder Pet</h2>
+
+<img src={{random_pet.photo_url}} alt="">
+<b>{{ random_pet.name }} is available!</b>
+<b>{{random_pet.age}}</b>
+
   {% for pet in pets %}
     {% if pet.available %}
       <img src={{pet.photo_url}} alt="">
